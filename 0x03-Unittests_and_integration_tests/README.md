@@ -16,7 +16,7 @@ This project focuses on writing and understanding unit and integration tests in 
 + client.py: Contains a class for accessing GitHub API data.
 + fixtures.py: Provides sample payloads for integration testing
 
-##Running the Tests
+## Running the Tests
 Run all tests in the module:
 ```
 python -m unittest discover
