@@ -5,7 +5,7 @@ Test cases for access_nested_map function.
 
 import unittest
 from parameterized import parameterized
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 from typing import Any, Dict, Tuple
 from unittest.mock import patch, Mock
 
@@ -72,6 +72,43 @@ class TestGetJson(unittest.TestCase):
             result = get_json(test_url)
             mocked_get.assert_called_once_with(test_url)
             self.assertEqual(result, test_payload)
+
+
+class TestMemoize(unittest.TestCase):
+    """Test cases for memoize decorator."""
+
+    def test_memoize(self) -> None:
+        """Test memoize decorator for caching a method result.
+        """
+
+        class TestClass:
+            """Class to test memoize decorator."""
+
+            def a_method(self) -> int:
+                """Simple method to be memoized."""
+                return 42
+
+            @memoize
+            def a_property(self) -> int:
+                """Property that uses memoized method."""
+                return self.a_method()
+
+        # Initialize the test class
+        test_instance = TestClass()
+
+        # Patch 'a_method' to verify its call behavior
+        with patch.object(
+                test_instance,
+                'a_method',
+                return_value=42
+                ) as mocked_method:
+            # First call to a_property should call a_method
+            self.assertEqual(test_instance.a_property, 42)
+            mocked_method.assert_called_once()
+
+            # 2nd call to a_property should use cached result
+            self.assertEqual(test_instance.a_property, 42)
+            mocked_method.assert_called_once()
 
 
 if __name__ == '__main__':
