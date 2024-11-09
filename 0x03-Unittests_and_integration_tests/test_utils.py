@@ -8,6 +8,7 @@ from parameterized import parameterized
 from utils import access_nested_map, get_json, memoize
 from typing import Any, Dict, Tuple
 from unittest.mock import patch, Mock
+from client import GithubOrgClient
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -109,6 +110,31 @@ class TestMemoize(unittest.TestCase):
             # 2nd call to a_property should use cached result
             self.assertEqual(test_instance.a_property, 42)
             mocked_method.assert_called_once()
+
+
+class TestGithubOrgClient(unittest.TestCase):
+    """Test cases for GithubOrgClient."""
+
+    @parameterized.expand([
+        ("google",),
+        ("abc",),
+    ])
+    @patch('client.get_json')
+    def test_org(self, org_name, mock_get_json):
+        """
+        Test that GithubOrgClient.org returns the correct value.
+        Mock get_json to ensure it's called with the expected argument.
+        """
+        # Instantiate the client with the org name
+        client = GithubOrgClient(org_name)
+
+        # Call the org method
+        client.org()
+
+        # Assert get_json was called once with the expected URL
+        mock_get_json.assert_called_once_with(
+            f"https://api.github.com/orgs/{org_name}"
+        )
 
 
 if __name__ == '__main__':
